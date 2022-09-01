@@ -1,7 +1,1 @@
-[
-	{
-		"id": "abcdef",
-		"Title": "Food",
-		"Type": "EXPENSE"
-	}
-]
+[{"id":"c19b3703-8377-470f-b76d-cb7ad6b80362","payee":"KFC","amount":1000,"date":"2022-09-01","categoryId":"e6e03178-2f9e-4575-b915-63d685fd540e"},{"id":"ee336391-1e3d-48b0-9b9d-d1137ac2459a","payee":"central","amount":1000,"date":"2022-09-01","categoryId":"4b955c16-a7e6-474b-aa4c-0a4fed1cc41a"},{"id":"2","payee":"MACDONAL","amount":1000,"date":"2022-09-01","categoryId":"e6e03178-2f9e-4575-b915-63d685fd540e"}]

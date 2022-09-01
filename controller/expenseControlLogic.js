@@ -1,4 +1,4 @@
-const { readTodo, writeTodo } = require('../services/fileExpense');
+const { readExpense, writeExpense } = require('../services/fileExpense');
 const uuid = require('uuid');
 
 //=====================================================Imported Zone
@@ -7,15 +7,15 @@ const uuid = require('uuid');
 const expenseGet = async function (req, res, next) {
 
     try {
-        const { title, completed, dueDate, offset, limit, sort } = req.query;
-        const data = await readTodo();
+        const { payee, amount, date, offset, limit, sort } = req.query;
+        const data = await readExpense();
         let clone = [...data]
-        clone = title ? clone.filter(item => item.todos.title === title) : clone;
-        clone = completed ? clone.filter(item => item.todos.completed === completed) : clone;
-        clone = dueDate ? clone.filter(item => item.todos.dueDate === dueDate) : clone;
+        clone = payee ? clone.filter(item => item.todos.title === title) : clone;
+        clone = amount ? clone.filter(item => item.todos.completed === completed) : clone;
+        clone = date ? clone.filter(item => item.todos.dueDate === dueDate) : clone;
         clone = offset ? clone.slice(offset) : clone;
         clone = limit ? clone.slice(0, limit) : clone;
-        clone = sort ? clone.sort((a, b) => { a > b ? 1 : -1 }) : clone;
+        clone = sort ? clone.sort((a, b) => { a.payee > b.payee ? 1 : -1 }) : clone;
         res.status(200).json(clone)
         
     } catch (err) {
@@ -27,9 +27,9 @@ const expenseGet = async function (req, res, next) {
 const expenseGetID = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const oldTodos = await readTodo();
-        const todo = oldTodos.find(item => item.id === id) ?? null;
-        res.json(todo);
+        const oldExpense = await readExpense();
+        const expense = oldExpense.find(item => item.id === id) ?? null;
+        res.json(expense);
 
     } catch (err) {
         next(err);
@@ -39,22 +39,22 @@ const expenseGetID = async (req, res, next) => {
 //=====================================================POST Zone
 const expensePost = async (req, res, next) => {
     try {
-        const { id, title, completed, dueDate = '1970-01-01' } = req.body
-        if (!title || !title.trim()) {
+        const { id, payee, amount, date = '1970-01-01',categoryId } = req.body
+        if (!payee || !payee.trim()) {
             return res.status(400).json({ message: 'title is required' });
         }
-        if (typeof completed !== 'boolean') {
-            return res.status(400).json({ message: 'completed must be a boolean' });
+        if (typeof amount !== 'number') {
+            return res.status(400).json({ message: 'completed must be a number' });
         }
-        if (dueDate !== undefined && isNaN(new Date(dueDate).getTime())) {
+        if (date !== undefined && isNaN(new Date(date).getTime())) {
             return res.status(400).json({ message: 'invalid due date' });
         }
 
-        const newTodo = { id: uuid.v4(), title, completed, dueDate }
-        const oldTodos = await readTodo();
-        oldTodos.unshift(newTodo);
-        await writeTodo(oldTodos)
-        res.status(201).json({ "newData": newTodo })
+        const newExpense = { id: uuid.v4(), payee, amount, date,categoryId }
+        const oldExpense = await readExpense();
+        oldExpense.unshift(newExpense);
+        await writeExpense(oldExpense)
+        res.status(201).json({ "newData": newExpense })
 
     } catch (err) {
         next(err);
@@ -65,13 +65,13 @@ const expensePost = async (req, res, next) => {
 //=====================================================PUT Zone
 const expensePut = async (req, res, next) => {
     try {
-        const { title, completed, dueDate } = req.body;
+        const { payee, amount, date,categoryId } = req.body;
         const { id } = req.params;
-        const oldTodos = await readTodo();
-        const newTodo = { id, title, completed, dueDate };
-        const mewTodos = oldTodos.map(item => (item.id === id ? newTodo : item))
-        await writeTodo(mewTodos)
-        res.status(200).json({ update: newTodo })
+        const oldExpense = await readExpense();
+        const newExpense = { id, payee, amount, date,categoryId };
+        const mewExpense = oldExpense.map(item => (item.id === id ? newExpense : item))
+        await writeExpense(mewExpense)
+        res.status(200).json({ update: newExpense })
         
     } catch (err) {
         next(err);
@@ -82,9 +82,9 @@ const expensePut = async (req, res, next) => {
 const expenseDelete = async (req, res, next) => {
     const { id } = req.params;
     try {
-        const oldTodos = await readTodo();
-        const newTodos = oldTodos.filter(item => item.id !== id)
-        await writeTodo(newTodos)
+        const oldExpense = await readExpense();
+        const newExpense = oldExpense.filter(item => item.id !== id)
+        await writeExpense(newExpense)
         res.status(200).json({ message: 'Success delete' })
 
     } catch (err) {
