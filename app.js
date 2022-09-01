@@ -3,7 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const errFn = require('./middleweres/error');
 const notFound = require('./middleweres/notFound')
-const todosRoutes = require('./routes/todoRoute')
+const expenseRoute = require('./routes/expenseRoute')
+
+const categoryRoute = require('./routes/categoryRoute')
 //=====================================================Imported Zone
 //=====================================================constance & local imported Zone
 const app = express();
@@ -16,7 +18,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //=====================================================Encoding Zone
 //=====================================================Express Zone
-app.use('/todos',todosRoutes)
+app.use('/transection',expenseRoute)
+app.use('/category',categoryRoute)
 //=====================================================Express Zone
 //=====================================================Throwing Zone
 app.use(notFound);
