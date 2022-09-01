@@ -1,6 +1,5 @@
 //=====================================================Imported Zone
 const express = require('express');
-const uuid = require('uuid');
 const cors = require('cors');
 const errFn = require('./middleweres/error');
 const notFound = require('./middleweres/notFound')

@@ -5,16 +5,23 @@ const uuid = require('uuid');
 
 //=====================================================GET Zone
 const todosGet = async function (req, res, next) {
-    const { title, completed, dueDate, offset, limit, sort } = req.query;
-    const data = await readTodo();
-    let clone = [...data]
-    clone = title ? clone.filter(item => item.todos.title === title) : clone;
-    clone = completed ? clone.filter(item => item.todos.completed === completed) : clone;
-    clone = dueDate ? clone.filter(item => item.todos.dueDate === dueDate) : clone;
-    clone = offset ? clone.slice(offset) : clone;
-    clone = limit ? clone.slice(0, limit) : clone;
-    clone = sort ? clone.sort((a, b) => { a > b ? 1 : -1 }) : clone;
-    res.status(200).json(clone)
+
+    try {
+        const { title, completed, dueDate, offset, limit, sort } = req.query;
+        const data = await readTodo();
+        let clone = [...data]
+        clone = title ? clone.filter(item => item.todos.title === title) : clone;
+        clone = completed ? clone.filter(item => item.todos.completed === completed) : clone;
+        clone = dueDate ? clone.filter(item => item.todos.dueDate === dueDate) : clone;
+        clone = offset ? clone.slice(offset) : clone;
+        clone = limit ? clone.slice(0, limit) : clone;
+        clone = sort ? clone.sort((a, b) => { a > b ? 1 : -1 }) : clone;
+        res.status(200).json(clone)
+        
+    } catch (err) {
+        next(err);
+    }
+
 }
 
 const todosGetID = async (req, res, next) => {
@@ -23,8 +30,9 @@ const todosGetID = async (req, res, next) => {
         const oldTodos = await readTodo();
         const todo = oldTodos.find(item => item.id === id) ?? null;
         res.json(todo);
+
     } catch (err) {
-        res.status(500).json({ err: err.message })
+        next(err);
     }
 
 }
@@ -48,8 +56,8 @@ const todosPost = async (req, res, next) => {
         await writeTodo(oldTodos)
         res.status(201).json({ "newData": newTodo })
 
-    } catch (error) {
-        res.status(500).json({ message: error.message })
+    } catch (err) {
+        next(err);
     }
 
 
@@ -64,8 +72,9 @@ const todosPut = async (req, res, next) => {
         const mewTodos = oldTodos.map(item => (item.id === id ? newTodo : item))
         await writeTodo(mewTodos)
         res.status(200).json({ update: newTodo })
+        
     } catch (err) {
-        res.status(500).json({ err: err.message })
+        next(err);
     }
 
 }
@@ -79,7 +88,7 @@ const todosDelete = async (req, res, next) => {
         res.status(200).json({ message: 'Success delete' })
 
     } catch (err) {
-        res.status(500).json({ err: err.message })
+        next(err);
     }
 }
 //=====================================================Exported Zone
